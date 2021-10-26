@@ -31,11 +31,14 @@ namespace Consumer {
 
             var events = await result.ToListAsync(cancellationToken);
 
-            /*
+            var clientObject = new Client();
+            
             foreach (var @event in events) {
-                Console.WriteLine(Encoding.UTF8.GetString(@event.Event.Data.ToArray()));
+                var jsonObj = Encoding.UTF8.GetString(@event.Event.Data.ToArray());
+                clientObject.When(jsonObj, @event.Event.EventType);
             }
-            */
+
+            Console.WriteLine($"Investment Total: {clientObject.InvestmentTotal}");
 
             var endTime = DateTime.Now;
             Console.WriteLine($"Time to consume {events.Count} messages: {endTime - startTime}");

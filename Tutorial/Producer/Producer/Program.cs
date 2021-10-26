@@ -74,7 +74,7 @@ namespace Producer {
             return 0;
         }
 
-        static async Task InitClient(EventStoreClient client, EventHandler handler) {
+        static async Task<string> InitClient(EventStoreClient client, EventHandler handler) {
 
             var streamName = await CreateClientEvent(client, new EventHandler());
 
@@ -90,6 +90,8 @@ namespace Producer {
             await Deposit(client, handler, streamName, 50.00);
             await Deposit(client, handler, streamName, 100.00);
             await Withdraw(client, handler, streamName, 50.00);
+
+            return streamName;
 
         }
 
@@ -120,8 +122,8 @@ namespace Producer {
 
             var client = new EventStoreClient(settings);
             var handler = new EventHandler();
-
-            
+            var stream = await InitClient(client, handler);
+            await UpdateClient(client, handler, streamName: stream);
         }
     }
 
