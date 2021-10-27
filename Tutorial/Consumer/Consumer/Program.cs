@@ -25,7 +25,7 @@ namespace Consumer {
 
             var result = client.ReadStreamAsync(
                 Direction.Forwards,
-                "client-a03fe6e4-2118-42a5-830e-a2cea0252a5b",
+                "client-fbe82c4d-18e1-41dc-bbf0-eb747fcba5dd",
                 StreamPosition.Start,
                 cancellationToken: cancellationToken);
 
@@ -38,6 +38,7 @@ namespace Consumer {
                 clientObject.When(jsonObj, @event.Event.EventType);
             }
 
+            Console.WriteLine($"Client Name: {clientObject.FirstName} {clientObject.LastName}");
             Console.WriteLine($"Investment Total: {clientObject.InvestmentTotal}");
 
             var endTime = DateTime.Now;

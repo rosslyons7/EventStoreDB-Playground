@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Consumer.Models {
-    public record ClientInvestmentDeposit {
+namespace ClientAPI.Models {
+    public record ClientInvestmentWithdrawal {
 
-        public double AmountDeposited { get; set; }
+        public double AmountWithdrawn { get; set; }
     }
 }

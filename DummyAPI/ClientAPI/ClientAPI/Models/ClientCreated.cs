@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Consumer.Models {
+namespace ClientAPI.Models {
     public record ClientCreated {
         public Guid Id { get; set; }
         public string FirstName { get; set; }

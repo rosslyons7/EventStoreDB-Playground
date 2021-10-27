@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
-using Consumer.Models;
+﻿using ClientAPI.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Consumer {
-    class Client {
+namespace ClientAPI.Entities {
+    public class Client {
 
         public Guid Id { get; set; }
         public string FirstName { get; set; }
@@ -30,14 +30,14 @@ namespace Consumer {
                 case "investment-withdrawal":
                     Apply(JsonConvert.DeserializeObject<ClientInvestmentWithdrawal>(jsonObj));
                     break;
-                case "name-change":
+                case "change-name":
                     Apply(JsonConvert.DeserializeObject<ClientNameChange>(jsonObj));
                     break;
             }
         }
 
         private void Apply(ClientCreated @event) {
-            Console.WriteLine($"Initial Deposit: {@event.InvestmentTotal}");
+            //Console.WriteLine($"Initial Deposit: {@event.InvestmentTotal}");
             Id = @event.Id;
             FirstName = @event.FirstName;
             LastName = @event.LastName;
@@ -51,13 +51,13 @@ namespace Consumer {
 
         private void Apply(ClientInvestmentDeposit @event) {
 
-            Console.WriteLine($"Deposit: {@event.AmountDeposited}");
+            //Console.WriteLine($"Deposit: {@event.AmountDeposited}");
             InvestmentTotal += @event.AmountDeposited;
         }
 
         private void Apply(ClientInvestmentWithdrawal @event) {
 
-            Console.WriteLine($"Withdrawal: {@event.AmountWithdrawn}");
+            //Console.WriteLine($"Withdrawal: {@event.AmountWithdrawn}");
             InvestmentTotal -= @event.AmountWithdrawn;
         }
 

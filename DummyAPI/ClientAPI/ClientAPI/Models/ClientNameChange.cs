@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Consumer.Models {
+namespace ClientAPI.Models {
     public record ClientNameChange {
 
         public string FirstName {get; set;}

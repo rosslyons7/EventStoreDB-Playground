@@ -31,7 +31,7 @@ namespace Producer {
             return $"client-{evt.Id}";
         }
 
-        static async Task<int> Deposit(EventStoreClient client, EventHandler eventHandler, string streamName, double deposit) {
+        static async void Deposit(EventStoreClient client, EventHandler eventHandler, string streamName, double deposit) {
             var token = new CancellationTokenSource();
 
 
@@ -50,10 +50,9 @@ namespace Producer {
               cancellationToken: token.Token
               );
 
-            return 0;
         }
 
-        static async Task<int> Withdraw(EventStoreClient client, EventHandler eventHandler, string streamName, double withdrawal) {
+        static async void Withdraw(EventStoreClient client, EventHandler eventHandler, string streamName, double withdrawal) {
             var token = new CancellationTokenSource();
 
 
@@ -71,25 +70,44 @@ namespace Producer {
               cancellationToken: token.Token
               );
 
-            return 0;
+        }
+
+        static async void ChangeName(EventStoreClient client, EventHandler eventHandler, string streamName, string firstName, string lastName) {
+            var token = new CancellationTokenSource();
+
+
+            var evt = eventHandler.ChangeName(firstName, lastName);
+
+            var eventData = new EventData(
+                Uuid.NewUuid(),
+                $"change-name",
+                JsonSerializer.SerializeToUtf8Bytes(evt));
+
+            await client.AppendToStreamAsync(
+              streamName,
+              StreamState.Any,
+              new[] { eventData },
+              cancellationToken: token.Token
+              );
+
         }
 
         static async Task<string> InitClient(EventStoreClient client, EventHandler handler) {
 
             var streamName = await CreateClientEvent(client, new EventHandler());
 
-            await Deposit(client, handler, streamName, 250.00);
-            await Deposit(client, handler, streamName, 50.00);
-            await Deposit(client, handler, streamName, 100.00);
-            await Deposit(client, handler, streamName, 10.00);
-            await Deposit(client, handler, streamName, 50.00);
+            Deposit(client, handler, streamName, 250.00);
+            Deposit(client, handler, streamName, 50.00);
+            Deposit(client, handler, streamName, 100.00);
+            Deposit(client, handler, streamName, 10.00);
+            Deposit(client, handler, streamName, 50.00);
 
 
-            await Withdraw(client, handler, streamName, 50.00);
-            await Withdraw(client, handler, streamName, 100.00);
-            await Deposit(client, handler, streamName, 50.00);
-            await Deposit(client, handler, streamName, 100.00);
-            await Withdraw(client, handler, streamName, 50.00);
+            Withdraw(client, handler, streamName, 50.00);
+            Withdraw(client, handler, streamName, 100.00);
+            Deposit(client, handler, streamName, 50.00);
+            Deposit(client, handler, streamName, 100.00);
+            Withdraw(client, handler, streamName, 50.00);
 
             return streamName;
 
@@ -97,19 +115,13 @@ namespace Producer {
 
         static async Task UpdateClient(EventStoreClient client, EventHandler handler, string streamName) {
 
+            for (int i = 0; i < 5000; i++) {
+                Deposit(client, handler, streamName, 250.00);
+                Withdraw(client, handler, streamName, 50.00);
+            }
 
-            await Deposit(client, handler, streamName, 250.00);
-            await Deposit(client, handler, streamName, 50.00);
-            await Deposit(client, handler, streamName, 100.00);
-            await Deposit(client, handler, streamName, 10.00);
-            await Deposit(client, handler, streamName, 50.00);
+            ChangeName(client, handler, streamName, "David", "Lazaro");
 
-
-            await Withdraw(client, handler, streamName, 50.00);
-            await Withdraw(client, handler, streamName, 100.00);
-            await Deposit(client, handler, streamName, 50.00);
-            await Deposit(client, handler, streamName, 100.00);
-            await Withdraw(client, handler, streamName, 50.00);
 
         }
 
@@ -119,11 +131,14 @@ namespace Producer {
             var settings = EventStoreClientSettings
                 .Create("esdb://localhost:2113?tls=false&tlsVerifyCert=false");
 
-
             var client = new EventStoreClient(settings);
             var handler = new EventHandler();
-            var stream = await InitClient(client, handler);
-            await UpdateClient(client, handler, streamName: stream);
+            //var stream = await InitClient(client, handler);
+            var start = DateTime.Now;
+            await UpdateClient(client, handler, streamName: "client-fbe82c4d-18e1-41dc-bbf0-eb747fcba5dd");
+            var end = DateTime.Now;
+            Console.WriteLine($"Time taken to produce 10,001 updates: {end-start}");
+
         }
     }
 
