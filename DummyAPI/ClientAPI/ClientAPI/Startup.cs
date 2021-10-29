@@ -33,6 +33,7 @@ namespace ClientAPI {
 
             services.AddSingleton<IEventStoreContext, EventStoreContext>();
             services.AddScoped<IClientService, ClientService>();
+            services.AddScoped<IPortfolioService, PortfolioService>();
         }
         
 
