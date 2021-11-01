@@ -77,6 +77,29 @@ namespace ClientAPI.EventHandlers {
                 JsonSerializer.SerializeToUtf8Bytes(evt));
         }
 
-        
+        public static EventData PortfolioWithdrawal(double withdrawal) {
+            var evt = new PortfolioWithdrawal
+            {
+                WithdrawalAmount = withdrawal
+            };
+
+            return new EventData(
+                Uuid.NewUuid(),
+                $"portfolio-withdrawal",
+                JsonSerializer.SerializeToUtf8Bytes(evt));
+        }
+
+        public static EventData PortfolioDeposit(double deposit) {
+            var evt = new PortfolioDeposit
+            {
+                DepositAmount = deposit
+            };
+
+            return new EventData(
+                Uuid.NewUuid(),
+                $"portfolio-deposit",
+                JsonSerializer.SerializeToUtf8Bytes(evt));
+        }
+
     }
 }

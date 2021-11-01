@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace ClientAPI.Services {
     public interface IPortfolioService {
-        Task ChangePrice(Guid portfolioId, Guid investmentId, double priceChange);
-        Task CreateInvestment(Guid portfolioId, string investmentId, double initialInvestment);
+        Task ChangePrice(ChangePriceRequest request, CancellationToken cancellationToken);
+        Task CreateInvestment(CreateInvestmentRequest request, CancellationToken cancellationToken);
         Task DepositToInvestment(DepositToInvestmentRequest request, CancellationToken cancellationToken);
-        Task DepositToPortfolio(Guid portfolioId, double deposit);
-        Task WithdrawFromInvestment(Guid portfolioId, string investmentId, double withdrawal);
-        Task WithdrawFromPortfolio(Guid portfolioId, double withdrawal);
+        Task DepositToPortfolio(DepositToPortfolioRequest request, CancellationToken cancellationToken);
+        Task WithdrawFromInvestment(WithdrawFromInvestmentRequest request, CancellationToken cancellationToken);
+        Task WithdrawFromPortfolio(WithdrawFromPortfolioRequest request, CancellationToken cancellationToken);
         Task<Guid> CreatePortfolio(CancellationToken cancellationToken);
         Task<Portfolio> BuildPortfolio(Guid portfolioId, CancellationToken cancellationToken);
     }

@@ -26,6 +26,12 @@ namespace ClientAPI.Entities {
                 case "investment-withdrawal":
                     Apply(JsonConvert.DeserializeObject<InvestmentWithdrawal>(jsonObj));
                     break;
+                case "portfolio-withdrawal":
+                    Apply(JsonConvert.DeserializeObject<PortfolioWithdrawal>(jsonObj));
+                    break;
+                case "portfolio-deposit":
+                    Apply(JsonConvert.DeserializeObject<PortfolioDeposit>(jsonObj));
+                    break;
                 case "create-investment":
                     Apply(JsonConvert.DeserializeObject<CreateInvestment>(jsonObj));
                     break;
@@ -49,10 +55,43 @@ namespace ClientAPI.Entities {
                 case CreateInvestment createInvestment:
                     Apply(createInvestment);
                     break;
+                case PortfolioDeposit portfolioDeposit:
+                    Apply(portfolioDeposit);
+                    break;
+                case PortfolioWithdrawal portfolioWithdrawal:
+                    Apply(portfolioWithdrawal);
+                    break;
                 case CreatePortfolio createPortfolio:
                     Apply(createPortfolio);
                     break;
             }
+        }
+
+        private void Apply(PortfolioWithdrawal @event) {
+
+            if (@event.WithdrawalAmount <= 0.00) throw new Exception($"Withdrawal amount must be greater than 0. (Amount = ${@event.WithdrawalAmount})");
+            if (TotalValue < @event.WithdrawalAmount) throw new Exception($"Withdrawal amount ({@event.WithdrawalAmount}) cannot be greater than portfolio value ({TotalValue}).");
+    
+            //not very realistic code to mock a full portfolio withdrawal
+            var split = @event.WithdrawalAmount / Investments.Count;
+            foreach (var investment in Investments) {
+                if (investment.HoldingValue < split) throw new Exception($"Split of withdrawal ({split}) cannot be greater than individual investment holding value ({investment.HoldingValue}).");
+                investment.HoldingValue -= split;
+            }
+            TotalValue -= @event.WithdrawalAmount;
+        }
+
+        private void Apply(PortfolioDeposit @event) {
+
+            if (@event.DepositAmount <= 0.00) throw new Exception($"Deposit amount must be greater than 0. (Amount = {@event.DepositAmount})");
+
+            //not very realistic code to mock a full portfolio deposit
+            var split = @event.DepositAmount / Investments.Count;
+            foreach(var investment in Investments) {
+                investment.HoldingValue += split;
+            }
+
+            TotalValue += @event.DepositAmount;
         }
 
         private void Apply(ChangePrice @event) {
@@ -113,7 +152,7 @@ namespace ClientAPI.Entities {
             var investment = Investments.SingleOrDefault(i => i.Id == @event.InvestmentId);
 
             if (investment == null) throw new Exception($"No investment with Id {@event.InvestmentId} exists in this portfolio.");
-
+            if (@event.WithdrawalAmount > investment.HoldingValue) throw new Exception($"Withdrawal amount ({@event.WithdrawalAmount}) cannot exceed holding value ({investment.HoldingValue}).");
             investment.HoldingValue -= @event.WithdrawalAmount;
             TotalValue -= @event.WithdrawalAmount;
 

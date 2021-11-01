@@ -4,9 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace ClientAPI.Models.PortfolioEvents {
-    public record InvestmentWithdrawal {
+    public record PortfolioWithdrawal {
 
-        public string InvestmentId { get; set; }
         public double WithdrawalAmount { get; set; }
     }
 }

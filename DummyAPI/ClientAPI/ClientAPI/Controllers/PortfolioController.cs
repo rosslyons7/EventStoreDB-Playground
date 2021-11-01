@@ -16,14 +16,18 @@ namespace ClientAPI.Controllers {
         private readonly IPortfolioService _portfolioService;
 
         [HttpPost(nameof(CreateInvestment))]
-        public async Task<IActionResult> CreateInvestment() {
-            throw new NotImplementedException();
+        public async Task<IActionResult> CreateInvestment(CreateInvestmentRequest request, CancellationToken cancellationToken) {
+            try {
+                await _portfolioService.CreateInvestment(request, cancellationToken);
+                return Ok();
+            }catch(Exception e) {
+                return StatusCode(500, e.Message);
+            }
         }
 
         [HttpPost(nameof(CreatePortfolio))]
         public async Task<IActionResult> CreatePortfolio(CancellationToken cancellationToken) {
             try {
-                
                 return Ok(await _portfolioService.CreatePortfolio(cancellationToken));
             }catch(Exception e) {
                 return StatusCode(500, e.Message);
@@ -31,8 +35,14 @@ namespace ClientAPI.Controllers {
         }
 
         [HttpPut(nameof(ChangePrice))]
-        public async Task<IActionResult> ChangePrice() {
-            throw new NotImplementedException();
+        public async Task<IActionResult> ChangePrice(ChangePriceRequest request, CancellationToken cancellationToken) {
+            try {
+                await _portfolioService.ChangePrice(request, cancellationToken);
+                return Ok();
+            }
+            catch (Exception e) {
+                return StatusCode(500, e.Message);
+            }
         }
 
         [HttpPost(nameof(DepositToInvestment))]
@@ -46,8 +56,14 @@ namespace ClientAPI.Controllers {
         }
 
         [HttpPost(nameof(DepositToPortfolio))]
-        public async Task<IActionResult> DepositToPortfolio() {
-            throw new NotImplementedException();
+        public async Task<IActionResult> DepositToPortfolio(DepositToPortfolioRequest request, CancellationToken cancellationToken) {
+            try {
+                await _portfolioService.DepositToPortfolio(request, cancellationToken);
+                return Ok();
+            }
+            catch (Exception e) {
+                return StatusCode(500, e.Message);
+            }
         }
 
         [HttpGet(nameof(GetPortfolio))]
@@ -60,13 +76,25 @@ namespace ClientAPI.Controllers {
         }
 
         [HttpPost(nameof(WithdrawFromInvestment))]
-        public async Task<IActionResult> WithdrawFromInvestment() {
-            throw new NotImplementedException();
+        public async Task<IActionResult> WithdrawFromInvestment(WithdrawFromInvestmentRequest request, CancellationToken cancellationToken) {
+            try {
+                await _portfolioService.WithdrawFromInvestment(request, cancellationToken);
+                return Ok();
+            }
+            catch (Exception e) {
+                return StatusCode(500, e.Message);
+            }
         }
 
         [HttpPost(nameof(WithdrawFromPortfolio))]
-        public async Task<IActionResult> WithdrawFromPortfolio() {
-            throw new NotImplementedException();
+        public async Task<IActionResult> WithdrawFromPortfolio(WithdrawFromPortfolioRequest request, CancellationToken cancellationToken) {
+            try {
+                await _portfolioService.WithdrawFromPortfolio(request, cancellationToken);
+                return Ok();
+            }
+            catch (Exception e) {
+                return StatusCode(500, e.Message);
+            }
         }
         
 

@@ -40,13 +40,38 @@ namespace ClientAPI.Services {
             await GetPortfolioAggregate(portfolioId, cancellationToken);
 
 
-        public async Task ChangePrice(Guid portfolioId, Guid investmentId, double priceChange) {
+        public async Task ChangePrice(ChangePriceRequest request, CancellationToken cancellationToken) {
 
-            
+            var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
+            portfolio.When(new ChangePrice
+            {
+                InvestmentId = request.InvestmentId,
+                PercentageChange = request.PercentageChange
+            });
+
+            await _eventStore.AppendToStreamAsync(
+                $"portfolio-{request.PortfolioId}",
+                StreamState.Any,
+                new[] { PortfolioEventHandler.ChangePrice(request.InvestmentId, request.PercentageChange) },
+                cancellationToken: cancellationToken
+                );
         }
 
-        public async Task CreateInvestment(Guid portfolioId, string investmentId, double initialInvestment) {
+        public async Task CreateInvestment(CreateInvestmentRequest request, CancellationToken cancellationToken) {
 
+            var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
+            portfolio.When(new CreateInvestment
+            {
+                InvestmentId = request.InvestmentId,
+                InitialInvestment = request.InitialInvestment
+            });
+
+            await _eventStore.AppendToStreamAsync(
+                $"portfolio-{request.PortfolioId}",
+                StreamState.Any,
+                new[] { PortfolioEventHandler.InvestmentDeposit(request.InvestmentId, request.InitialInvestment) },
+                cancellationToken: cancellationToken
+                );
         }
 
         public async Task DepositToInvestment(DepositToInvestmentRequest request, CancellationToken cancellationToken) {
@@ -67,16 +92,51 @@ namespace ClientAPI.Services {
           
         }
 
-        public async Task WithdrawFromInvestment(Guid portfolioId, string investmentId, double withdrawal) {
+        public async Task WithdrawFromInvestment(WithdrawFromInvestmentRequest request, CancellationToken cancellationToken) {
 
+            var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
+            portfolio.When(new InvestmentWithdrawal
+            {
+                InvestmentId = request.InvestmentId,
+                WithdrawalAmount = request.Withdrawal
+            });
+
+            await _eventStore.AppendToStreamAsync(
+            $"portfolio-{request.PortfolioId}",
+            StreamState.Any,
+            new[] { PortfolioEventHandler.InvestmentWithdrawal(request.InvestmentId, request.Withdrawal) },
+            cancellationToken: cancellationToken
+            );
         }
 
-        public async Task DepositToPortfolio(Guid portfolioId, double deposit) {
+        public async Task DepositToPortfolio(DepositToPortfolioRequest request, CancellationToken cancellationToken) {
+            var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
+            portfolio.When(new PortfolioDeposit
+            {
+                DepositAmount = request.Deposit
+            });
 
+            await _eventStore.AppendToStreamAsync(
+            $"portfolio-{request.PortfolioId}",
+            StreamState.Any,
+            new[] { PortfolioEventHandler.PortfolioDeposit(request.Deposit) },
+            cancellationToken: cancellationToken
+            );
         }
 
-        public async Task WithdrawFromPortfolio(Guid portfolioId, double withdrawal) {
+        public async Task WithdrawFromPortfolio(WithdrawFromPortfolioRequest request, CancellationToken cancellationToken) {
+            var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
+            portfolio.When(new PortfolioWithdrawal
+            {
+                WithdrawalAmount = request.Withdrawal
+            });
 
+            await _eventStore.AppendToStreamAsync(
+            $"portfolio-{request.PortfolioId}",
+            StreamState.Any,
+            new[] { PortfolioEventHandler.PortfolioWithdrawal(request.Withdrawal) },
+            cancellationToken: cancellationToken
+            );
         }
 
         public async Task<Guid> CreatePortfolio(CancellationToken cancellationToken) {
@@ -145,6 +205,8 @@ namespace ClientAPI.Services {
 
             }
         }
+
+        
 
         public PortfolioService(IEventStoreContext eventStore) {
 
