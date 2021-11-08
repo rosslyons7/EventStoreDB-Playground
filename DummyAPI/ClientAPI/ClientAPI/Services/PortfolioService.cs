@@ -23,7 +23,7 @@ namespace ClientAPI.Services {
                $"portfolio-{portfolioId}",
                StreamPosition.Start,
                cancellationToken: cancellationToken,
-               configureOperationOptions: o => o.TimeoutAfter = TimeSpan.FromSeconds(15)
+               configureOperationOptions: o => o.TimeoutAfter = TimeSpan.FromSeconds(35)
                );
 
             var events = await result.ToListAsync(cancellationToken: cancellationToken);
@@ -36,8 +36,22 @@ namespace ClientAPI.Services {
             return portfolio;
         }
 
-        public async Task<Portfolio> BuildPortfolio(Guid portfolioId, CancellationToken cancellationToken) =>
-            await GetPortfolioAggregate(portfolioId, cancellationToken);
+        public async Task<Portfolio> BuildPortfolio(Guid portfolioId, CancellationToken cancellationToken) {
+            Portfolio result = new();
+
+            var totalTime = new TimeSpan();
+            for(int i=0; i < 50; i++) {
+                var start = DateTime.Now;
+                result = await GetPortfolioAggregate(portfolioId, cancellationToken);
+                var end = DateTime.Now;
+                var timeTaken = end - start;
+                totalTime += timeTaken;
+            }
+
+            Console.WriteLine($"Time taken: {totalTime / 50}");
+            return result;
+        }
+            
 
 
         public async Task ChangePrice(ChangePriceRequest request, CancellationToken cancellationToken) {
@@ -150,13 +164,6 @@ namespace ClientAPI.Services {
                 cancellationToken: cancellationToken
                 );
 
-            await AppendDummyEventsToPortfolio(portfolioId, cancellationToken);
-
-            return portfolioId;
-        }
-
-        private async Task AppendDummyEventsToPortfolio(Guid portfolioId, CancellationToken cancellationToken) {
-
             var investment1 = PortfolioEventHandler.CreateInvestment("ABC", 50);
             var investment2 = PortfolioEventHandler.CreateInvestment("DEF", 100);
             var investment3 = PortfolioEventHandler.CreateInvestment("GHI", 150);
@@ -168,44 +175,82 @@ namespace ClientAPI.Services {
                  $"portfolio-{portfolioId}",
                  StreamState.Any,
                  new[] { investment1, investment2, investment3, investment4, investment5, investment6 },
-                 cancellationToken: cancellationToken
+                 cancellationToken: cancellationToken,
+                 configureOperationOptions: o => o.TimeoutAfter = TimeSpan.FromSeconds(15)
                  );
 
-            for(var i = 0; i < 50; i++) {
-                if (i % 2 == 0) {
-                    var deposit1 = PortfolioEventHandler.InvestmentDeposit("ABC", 50);
-                    var deposit2 = PortfolioEventHandler.InvestmentDeposit("DEF", 100);
-                    var deposit3 = PortfolioEventHandler.InvestmentDeposit("GHI", 150);
-                    var deposit4 = PortfolioEventHandler.InvestmentDeposit("JKL", 200);
-                    var deposit5 = PortfolioEventHandler.InvestmentDeposit("MNO", 250);
-                    var deposit6 = PortfolioEventHandler.InvestmentDeposit("PQR", 300);
-
-                    await _eventStore.AppendToStreamAsync(
-                        $"portfolio-{portfolioId}",
-                        StreamState.Any,
-                        new[] { deposit1, deposit2, deposit3, deposit4, deposit5, deposit6 },
-                        cancellationToken: cancellationToken
-                        );
-                }
-                else {
-                    var withdraw1 = PortfolioEventHandler.InvestmentWithdrawal("ABC", 25);
-                    var withdraw2 = PortfolioEventHandler.InvestmentWithdrawal("DEF", 75);
-                    var withdraw3 = PortfolioEventHandler.InvestmentWithdrawal("GHI", 125);
-                    var withdraw4 = PortfolioEventHandler.InvestmentWithdrawal("JKL", 175);
-                    var withdraw5 = PortfolioEventHandler.InvestmentWithdrawal("MNO", 225);
-                    var withdraw6 = PortfolioEventHandler.InvestmentWithdrawal("PQR", 275);
-
-                    await _eventStore.AppendToStreamAsync(
-                        $"portfolio-{portfolioId}",
-                        StreamState.Any,
-                        new[] { withdraw1, withdraw2, withdraw3, withdraw4, withdraw5, withdraw6 },
-                        cancellationToken: cancellationToken
-                        );
-                }
-
+            for(int i = 0; i < 1; i++) {
+                _ = AppendDummyEventsToPortfolio(portfolioId, 5, cancellationToken);
             }
+            
+
+
+
+            return portfolioId;
         }
 
+        public async Task PushEvents(Guid portfolioId, int events, int iterations, CancellationToken cancellationToken) {
+
+            var total = new TimeSpan();
+            for (int i = 0; i < iterations; i++) {
+                total += await AppendDummyEventsToPortfolio(portfolioId, events, cancellationToken);
+            }
+
+            Console.WriteLine($"Average time taken to append {events*2} events: {total / iterations}");
+        }
+
+        private async Task<TimeSpan> AppendDummyEventsToPortfolio(Guid portfolioId, int events, CancellationToken cancellationToken) {
+
+            var eventList = GetEventList(events).ToArray();
+            var start = DateTime.Now;
+
+            await _eventStore.AppendToStreamAsync(
+                    $"portfolio-{portfolioId}",
+                    StreamState.Any,
+                    eventList,
+                    cancellationToken: cancellationToken,
+                    configureOperationOptions: o => o.TimeoutAfter = TimeSpan.FromMinutes(2)
+                    );
+            var end = DateTime.Now;
+
+            return end - start;
+        }
+
+        private List<EventData> GetEventList(int events) {
+
+            var list = new List<EventData>();
+
+            for(int i=0; i < events; i++) {
+                switch(i % 6) {
+                    case 5:
+                        list.Add(PortfolioEventHandler.InvestmentDeposit("ABC", 50));
+                        list.Add(PortfolioEventHandler.InvestmentWithdrawal("ABC", 25));
+                        break;
+                    case 4:
+                        list.Add(PortfolioEventHandler.InvestmentDeposit("DEF", 60));
+                        list.Add(PortfolioEventHandler.InvestmentWithdrawal("DEF", 25));
+                        break;
+                    case 3:
+                        list.Add(PortfolioEventHandler.InvestmentDeposit("GHI", 70));
+                        list.Add(PortfolioEventHandler.InvestmentWithdrawal("GHI", 25));
+                        break;
+                    case 2:
+                        list.Add(PortfolioEventHandler.InvestmentDeposit("JKL", 80));
+                        list.Add(PortfolioEventHandler.InvestmentWithdrawal("JKL", 25));
+                        break;
+                    case 1:
+                        list.Add(PortfolioEventHandler.InvestmentDeposit("MNO", 90));
+                        list.Add(PortfolioEventHandler.InvestmentWithdrawal("MNO", 25));
+                        break;
+                    case 0:
+                        list.Add(PortfolioEventHandler.InvestmentDeposit("PQR", 100));
+                        list.Add(PortfolioEventHandler.InvestmentWithdrawal("PQR", 25));
+                        break;
+                }
+            }
+
+            return list;
+        }
         
 
         public PortfolioService(IEventStoreContext eventStore) {

@@ -1,5 +1,6 @@
 using ClientAPI.Context;
 using ClientAPI.Services;
+using ClientAPI.Subscriptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,6 +35,9 @@ namespace ClientAPI {
             services.AddSingleton<IEventStoreContext, EventStoreContext>();
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IPortfolioService, PortfolioService>();
+            services.AddSingleton<IHostedService>(sp => new PersistentSubscription(
+                sp.GetRequiredService<IServiceProvider>()
+                ));
         }
         
 

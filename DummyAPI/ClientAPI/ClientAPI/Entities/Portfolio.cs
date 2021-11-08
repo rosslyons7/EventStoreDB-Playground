@@ -107,9 +107,8 @@ namespace ClientAPI.Entities {
 
         private void Apply(CreateInvestment @event) {
 
-            if(Investments.Any(i => i.Id == @event.InvestmentId)) {
-                throw new Exception($"Investment with Id {@event.InvestmentId} already exists.");
-            }
+            var investment = Investments.SingleOrDefault(i => i.Id == @event.InvestmentId);
+            if (investment != null) throw new Exception($"Investment with Id {investment.Id} already exists.");
 
             Investments.Add(
                 new Investment

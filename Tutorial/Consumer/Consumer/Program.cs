@@ -11,7 +11,7 @@ namespace Consumer {
     class Program {
         static async Task Main() {
 
-            
+
             var cancellationToken = new CancellationTokenSource().Token;
 
 
@@ -20,29 +20,20 @@ namespace Consumer {
 
 
             var client = new EventStoreClient(settings);
+            var streamName = "portfolio-b3d52251-7374-4503-add6-3c79bae07166";
 
-            var startTime = DateTime.Now;
+            await client.SubscribeToStreamAsync(streamName,
+                async (subscription, evnt, cancellationToken) =>
+                {
+                    Console.WriteLine($"Received event {evnt.OriginalEventNumber}@{evnt.OriginalStreamId}");
+                    await HandleEvent(evnt);
+                });
 
-            var result = client.ReadStreamAsync(
-                Direction.Forwards,
-                "client-fbe82c4d-18e1-41dc-bbf0-eb747fcba5dd",
-                StreamPosition.Start,
-                cancellationToken: cancellationToken);
+            Console.WriteLine("Finished");
+        }
 
-            var events = await result.ToListAsync(cancellationToken);
-
-            var clientObject = new Client();
-            
-            foreach (var @event in events) {
-                var jsonObj = Encoding.UTF8.GetString(@event.Event.Data.ToArray());
-                clientObject.When(jsonObj, @event.Event.EventType);
-            }
-
-            Console.WriteLine($"Client Name: {clientObject.FirstName} {clientObject.LastName}");
-            Console.WriteLine($"Investment Total: {clientObject.InvestmentTotal}");
-
-            var endTime = DateTime.Now;
-            Console.WriteLine($"Time to consume {events.Count} messages: {endTime - startTime}");
+        static async Task HandleEvent(ResolvedEvent evnt) {
+            await Task.Delay(0);
         }
     }
 }

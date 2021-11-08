@@ -15,6 +15,18 @@ namespace ClientAPI.Controllers {
 
         private readonly IPortfolioService _portfolioService;
 
+
+        [HttpPost(nameof(PushEvents))]
+        public async Task<IActionResult> PushEvents(Guid portfolioId, int events, int iterations, CancellationToken cancellationToken) {
+            try {
+                await _portfolioService.PushEvents(portfolioId, events, iterations, cancellationToken);
+                return Ok();
+            }
+            catch (Exception e) {
+                return StatusCode(500, e.Message);
+            }
+        }
+
         [HttpPost(nameof(CreateInvestment))]
         public async Task<IActionResult> CreateInvestment(CreateInvestmentRequest request, CancellationToken cancellationToken) {
             try {
