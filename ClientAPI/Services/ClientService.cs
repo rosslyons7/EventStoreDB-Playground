@@ -4,7 +4,6 @@ using ClientAPI.Models;
 using ClientAPI.Responses;
 using EventStore.Client;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -36,7 +35,7 @@ namespace ClientAPI.Services {
             }
 
             var endTime = DateTime.Now;
-            return new TimedGetClientResponse {Client = client, Time = (endTime - startTime).ToString(), EventTotal = events.Count };
+            return new TimedGetClientResponse { Client = client, Time = (endTime - startTime).ToString(), EventTotal = events.Count };
         }
 
         public async void PushEventsToClientStream(string id, CancellationToken cancellationToken) {
@@ -55,8 +54,7 @@ namespace ClientAPI.Services {
 
         private EventData Deposit(double d) {
 
-            var evt =  new ClientInvestmentDeposit
-            {
+            var evt = new ClientInvestmentDeposit {
                 AmountDeposited = d
             };
 
@@ -68,8 +66,7 @@ namespace ClientAPI.Services {
 
         private EventData Withdraw(double withdrawal) {
 
-            var evt =  new ClientInvestmentWithdrawal
-            {
+            var evt = new ClientInvestmentWithdrawal {
                 AmountWithdrawn = withdrawal
             };
 
@@ -81,8 +78,7 @@ namespace ClientAPI.Services {
 
         private ClientNameChange ChangeName(string firstName, string lastName) {
 
-            return new ClientNameChange
-            {
+            return new ClientNameChange {
                 FirstName = firstName,
                 LastName = lastName
             };

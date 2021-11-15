@@ -3,8 +3,6 @@ using EventStore.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,11 +19,10 @@ namespace ClientAPI.Subscriptions {
         }
 
         private async void Consume() {
-          
+
             startTime = DateTime.Now;
             await _client.SubscribeToAllAsync(
-                async (subscription, evnt, cancellationToken) =>
-                {
+                async (subscription, evnt, cancellationToken) => {
                     events += 1;
                     Console.WriteLine($"Time taken to process {events} events -- {DateTime.Now - startTime}");
                     await HandleEvent(evnt);

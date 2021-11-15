@@ -1,5 +1,4 @@
-﻿using ClientAPI.Entities;
-using ClientAPI.Responses;
+﻿using ClientAPI.Responses;
 using System.Threading;
 using System.Threading.Tasks;
 

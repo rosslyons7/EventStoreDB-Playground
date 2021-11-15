@@ -28,7 +28,7 @@ namespace ClientAPI.Services {
 
             var events = await result.ToListAsync(cancellationToken: cancellationToken);
             var portfolio = new Portfolio();
-            foreach(var @event in events) {
+            foreach (var @event in events) {
                 var jsonObj = Encoding.UTF8.GetString(@event.Event.Data.ToArray());
                 portfolio.When(jsonObj, @event.Event.EventType);
             }
@@ -40,7 +40,7 @@ namespace ClientAPI.Services {
             Portfolio result = new();
 
             var totalTime = new TimeSpan();
-            for(int i=0; i < 50; i++) {
+            for (int i = 0; i < 50; i++) {
                 var start = DateTime.Now;
                 result = await GetPortfolioAggregate(portfolioId, cancellationToken);
                 var end = DateTime.Now;
@@ -51,14 +51,13 @@ namespace ClientAPI.Services {
             Console.WriteLine($"Time taken: {totalTime / 50}");
             return result;
         }
-            
+
 
 
         public async Task ChangePrice(ChangePriceRequest request, CancellationToken cancellationToken) {
 
             var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
-            portfolio.When(new ChangePrice
-            {
+            portfolio.When(new ChangePrice {
                 InvestmentId = request.InvestmentId,
                 PercentageChange = request.PercentageChange
             });
@@ -74,8 +73,7 @@ namespace ClientAPI.Services {
         public async Task CreateInvestment(CreateInvestmentRequest request, CancellationToken cancellationToken) {
 
             var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
-            portfolio.When(new CreateInvestment
-            {
+            portfolio.When(new CreateInvestment {
                 InvestmentId = request.InvestmentId,
                 InitialInvestment = request.InitialInvestment
             });
@@ -90,27 +88,25 @@ namespace ClientAPI.Services {
 
         public async Task DepositToInvestment(DepositToInvestmentRequest request, CancellationToken cancellationToken) {
 
-                var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
-                portfolio.When(new InvestmentDeposit
-                {
-                    InvestmentId = request.InvestmentId,
-                    DepositAmount = request.Deposit
-                });
+            var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
+            portfolio.When(new InvestmentDeposit {
+                InvestmentId = request.InvestmentId,
+                DepositAmount = request.Deposit
+            });
 
-                await _eventStore.AppendToStreamAsync(
-                $"portfolio-{request.PortfolioId}",
-                StreamState.Any,
-                new[] { PortfolioEventHandler.InvestmentDeposit(request.InvestmentId, request.Deposit) },
-                cancellationToken: cancellationToken
-                );
-          
+            await _eventStore.AppendToStreamAsync(
+            $"portfolio-{request.PortfolioId}",
+            StreamState.Any,
+            new[] { PortfolioEventHandler.InvestmentDeposit(request.InvestmentId, request.Deposit) },
+            cancellationToken: cancellationToken
+            );
+
         }
 
         public async Task WithdrawFromInvestment(WithdrawFromInvestmentRequest request, CancellationToken cancellationToken) {
 
             var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
-            portfolio.When(new InvestmentWithdrawal
-            {
+            portfolio.When(new InvestmentWithdrawal {
                 InvestmentId = request.InvestmentId,
                 WithdrawalAmount = request.Withdrawal
             });
@@ -125,8 +121,7 @@ namespace ClientAPI.Services {
 
         public async Task DepositToPortfolio(DepositToPortfolioRequest request, CancellationToken cancellationToken) {
             var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
-            portfolio.When(new PortfolioDeposit
-            {
+            portfolio.When(new PortfolioDeposit {
                 DepositAmount = request.Deposit
             });
 
@@ -140,8 +135,7 @@ namespace ClientAPI.Services {
 
         public async Task WithdrawFromPortfolio(WithdrawFromPortfolioRequest request, CancellationToken cancellationToken) {
             var portfolio = await GetPortfolioAggregate(request.PortfolioId, cancellationToken);
-            portfolio.When(new PortfolioWithdrawal
-            {
+            portfolio.When(new PortfolioWithdrawal {
                 WithdrawalAmount = request.Withdrawal
             });
 
@@ -179,10 +173,10 @@ namespace ClientAPI.Services {
                  configureOperationOptions: o => o.TimeoutAfter = TimeSpan.FromSeconds(15)
                  );
 
-            for(int i = 0; i < 1; i++) {
+            for (int i = 0; i < 1; i++) {
                 _ = AppendDummyEventsToPortfolio(portfolioId, 5, cancellationToken);
             }
-            
+
 
 
 
@@ -196,7 +190,7 @@ namespace ClientAPI.Services {
                 total += await AppendDummyEventsToPortfolio(portfolioId, events, cancellationToken);
             }
 
-            Console.WriteLine($"Average time taken to append {events*2} events: {total / iterations}");
+            Console.WriteLine($"Average time taken to append {events * 2} events: {total / iterations}");
         }
 
         private async Task<TimeSpan> AppendDummyEventsToPortfolio(Guid portfolioId, int events, CancellationToken cancellationToken) {
@@ -220,8 +214,8 @@ namespace ClientAPI.Services {
 
             var list = new List<EventData>();
 
-            for(int i=0; i < events; i++) {
-                switch(i % 6) {
+            for (int i = 0; i < events; i++) {
+                switch (i % 6) {
                     case 5:
                         list.Add(PortfolioEventHandler.InvestmentDeposit("ABC", 50));
                         list.Add(PortfolioEventHandler.InvestmentWithdrawal("ABC", 25));
@@ -251,7 +245,7 @@ namespace ClientAPI.Services {
 
             return list;
         }
-        
+
 
         public PortfolioService(IEventStoreContext eventStore) {
 

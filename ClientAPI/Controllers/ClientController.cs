@@ -1,8 +1,6 @@
 ﻿using ClientAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +15,8 @@ namespace ClientAPI.Controllers {
         public async Task<IActionResult> GetClientById(string id, CancellationToken cancellationToken) {
             try {
                 return Ok(await _clientService.GetClientById(id, cancellationToken));
-            }catch(Exception e) {
+            }
+            catch (Exception e) {
                 return StatusCode(500, e.Message);
             }
         }

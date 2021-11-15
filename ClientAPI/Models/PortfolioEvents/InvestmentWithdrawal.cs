@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ClientAPI.Models.PortfolioEvents {
+﻿namespace ClientAPI.Models.PortfolioEvents {
     public record InvestmentWithdrawal {
 
         public string InvestmentId { get; set; }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EventStore.Client;
+﻿using EventStore.Client;
 
 namespace ClientAPI.Context {
     public class EventStoreContext : IEventStoreContext {
@@ -10,9 +6,9 @@ namespace ClientAPI.Context {
         private readonly string _connectionString = "esdb://localhost:2113?tls=false&tlsVerifyCert=false";
         private readonly EventStoreClient _eventStoreClient;
 
-        public EventStoreClient GetClient() =>
-            _eventStoreClient;
-
+        public EventStoreClient GetClient() {
+            return _eventStoreClient;
+        }
 
         public EventStoreContext() {
 

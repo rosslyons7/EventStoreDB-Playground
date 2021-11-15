@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ClientAPI.Entities {
     public class Portfolio {
@@ -71,7 +70,7 @@ namespace ClientAPI.Entities {
 
             if (@event.WithdrawalAmount <= 0.00) throw new Exception($"Withdrawal amount must be greater than 0. (Amount = ${@event.WithdrawalAmount})");
             if (TotalValue < @event.WithdrawalAmount) throw new Exception($"Withdrawal amount ({@event.WithdrawalAmount}) cannot be greater than portfolio value ({TotalValue}).");
-    
+
             //not very realistic code to mock a full portfolio withdrawal
             var split = @event.WithdrawalAmount / Investments.Count;
             foreach (var investment in Investments) {
@@ -87,7 +86,7 @@ namespace ClientAPI.Entities {
 
             //not very realistic code to mock a full portfolio deposit
             var split = @event.DepositAmount / Investments.Count;
-            foreach(var investment in Investments) {
+            foreach (var investment in Investments) {
                 investment.HoldingValue += split;
             }
 
@@ -111,8 +110,7 @@ namespace ClientAPI.Entities {
             if (investment != null) throw new Exception($"Investment with Id {investment.Id} already exists.");
 
             Investments.Add(
-                new Investment
-                {
+                new Investment {
                     Id = @event.InvestmentId,
                     HoldingValue = @event.InitialInvestment
                 });
@@ -120,10 +118,10 @@ namespace ClientAPI.Entities {
             TotalValue += @event.InitialInvestment;
 
         }
-        
+
         private void Apply(CreatePortfolio @event) {
 
-            if(@event.Id == Guid.Empty || @event.Name == null || @event.ClientId == Guid.Empty || @event.ClientDisplayName == null) {
+            if (@event.Id == Guid.Empty || @event.Name == null || @event.ClientId == Guid.Empty || @event.ClientDisplayName == null) {
                 throw new Exception($"Incomplete portfolio for {@event.Id}");
             }
 

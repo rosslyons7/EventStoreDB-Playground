@@ -1,10 +1,7 @@
 ﻿using ClientAPI.Requests.PortfolioRequests;
 using ClientAPI.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,7 +29,8 @@ namespace ClientAPI.Controllers {
             try {
                 await _portfolioService.CreateInvestment(request, cancellationToken);
                 return Ok();
-            }catch(Exception e) {
+            }
+            catch (Exception e) {
                 return StatusCode(500, e.Message);
             }
         }
@@ -41,7 +39,8 @@ namespace ClientAPI.Controllers {
         public async Task<IActionResult> CreatePortfolio(CancellationToken cancellationToken) {
             try {
                 return Ok(await _portfolioService.CreatePortfolio(cancellationToken));
-            }catch(Exception e) {
+            }
+            catch (Exception e) {
                 return StatusCode(500, e.Message);
             }
         }
@@ -62,7 +61,8 @@ namespace ClientAPI.Controllers {
             try {
                 await _portfolioService.DepositToInvestment(request, cancellationToken);
                 return Ok();
-            }catch(Exception e) {
+            }
+            catch (Exception e) {
                 return StatusCode(500, e.Message);
             }
         }
@@ -82,7 +82,8 @@ namespace ClientAPI.Controllers {
         public async Task<IActionResult> GetPortfolio(Guid portfolioId, CancellationToken cancellationToken) {
             try {
                 return Ok(await _portfolioService.BuildPortfolio(portfolioId, cancellationToken));
-            }catch(Exception e) {
+            }
+            catch (Exception e) {
                 return StatusCode(500, e.Message);
             }
         }
@@ -108,7 +109,7 @@ namespace ClientAPI.Controllers {
                 return StatusCode(500, e.Message);
             }
         }
-        
+
 
         public PortfolioController(IPortfolioService portfolioService) {
 

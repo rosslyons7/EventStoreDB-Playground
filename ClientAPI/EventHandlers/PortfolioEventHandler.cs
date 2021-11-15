@@ -1,18 +1,14 @@
 ﻿using ClientAPI.Models.PortfolioEvents;
 using EventStore.Client;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace ClientAPI.EventHandlers {
     public static class PortfolioEventHandler {
 
         public static EventData CreatePortfolio(Guid portfolioId) {
 
-            var evt = new CreatePortfolio
-            {
+            var evt = new CreatePortfolio {
                 Id = portfolioId,
                 ClientDisplayName = "Dummy Client",
                 ClientId = Guid.NewGuid(),
@@ -26,8 +22,7 @@ namespace ClientAPI.EventHandlers {
         }
 
         public static EventData ChangePrice(string investmentId, double percentage) {
-            var evt = new ChangePrice
-            {
+            var evt = new ChangePrice {
                 InvestmentId = investmentId,
                 PercentageChange = percentage
             };
@@ -39,8 +34,7 @@ namespace ClientAPI.EventHandlers {
         }
 
         public static EventData CreateInvestment(string investmentId, double initialInvestment) {
-            var evt = new CreateInvestment
-            {
+            var evt = new CreateInvestment {
                 InvestmentId = investmentId,
                 InitialInvestment = initialInvestment
             };
@@ -52,8 +46,7 @@ namespace ClientAPI.EventHandlers {
         }
 
         public static EventData InvestmentDeposit(string investmentId, double deposit) {
-            var evt = new InvestmentDeposit
-            {
+            var evt = new InvestmentDeposit {
                 InvestmentId = investmentId,
                 DepositAmount = deposit
             };
@@ -65,8 +58,7 @@ namespace ClientAPI.EventHandlers {
         }
 
         public static EventData InvestmentWithdrawal(string investmentId, double withdrawal) {
-            var evt = new InvestmentWithdrawal
-            {
+            var evt = new InvestmentWithdrawal {
                 InvestmentId = investmentId,
                 WithdrawalAmount = withdrawal
             };
@@ -78,8 +70,7 @@ namespace ClientAPI.EventHandlers {
         }
 
         public static EventData PortfolioWithdrawal(double withdrawal) {
-            var evt = new PortfolioWithdrawal
-            {
+            var evt = new PortfolioWithdrawal {
                 WithdrawalAmount = withdrawal
             };
 
@@ -90,8 +81,7 @@ namespace ClientAPI.EventHandlers {
         }
 
         public static EventData PortfolioDeposit(double deposit) {
-            var evt = new PortfolioDeposit
-            {
+            var evt = new PortfolioDeposit {
                 DepositAmount = deposit
             };
 
